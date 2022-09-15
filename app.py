@@ -43,3 +43,9 @@ def follows():
             return res
         return "error contacting api, login: {}".format(login)
     return "no auth token in memory"
+
+
+@app.route("/write", methods=["GET"])
+def write():
+    login = "anarchicuk"
+    return twitch.write_ps1_files(login)

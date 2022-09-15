@@ -1,6 +1,7 @@
 from random import choice
 from string import ascii_letters, digits
 from http import HTTPStatus
+from os.path import exists as file_exists
 import requests
 from oauthlib.oauth2 import WebApplicationClient
 
@@ -86,27 +87,26 @@ class TwitchApi:
     def fetch_user(self, login):
         if self.token_is_valid() is False:
             raise Exception("Must first obtain auth token")
-        payload = {
-            "login": login
-        }
+        payload = {"login": login}
         headers = {
             "Authorization": "Bearer {}".format(self.token["access_token"]),
             "Client-Id": self.client_id
         }
         try:
-            user_response = requests.get(
+            res = requests.get(
                 self.endpoints["users"]["url"], params=payload,
                 headers=headers
             )
-            if user_response.status_code == HTTPStatus.OK:
-                return user_response.json()
+            if res.status_code == HTTPStatus.OK:
+                self.data["users"] = {login: res.json()["data"][0]}
+                return self.data["users"][login]
         except Exception as exc:
             raise Exception("Failed to obtain user(s)") from exc
 
     def fetch_follows(self, login, limit=100):
         if self.token_is_valid() is False:
             raise Exception("Must first obtain auth token")
-        user_id = self.fetch_user(login)["data"][0]["id"]
+        user_id = self.fetch_user(login)["id"]
         payload = {
             "from_id": f"{user_id}",
             "first": f"{limit}"  # return limit max
@@ -121,6 +121,30 @@ class TwitchApi:
                 headers=headers
             )
             if res.status_code == HTTPStatus.OK:
-                return res.json()
+                self.data["users"][login]["follows"] = res.json()["data"]
+                return self.data["users"][login]["follows"]
         except Exception as exc:
             raise Exception("Failed to obtain follows") from exc
+
+    def reduce_follows(self, login):
+        if self.data["users"][login]["follows"] is None:
+            return None
+        if len(self.data["users"][login]["follows"]) < 1:
+            return None
+        follows = []
+        for i in self.data["users"][login]["follows"]:
+            follows.append(i["to_name"])
+        return follows
+
+    def write_ps1_files(self, login):
+        TEMPLATE = open("./_twitch.ps1").read()
+        follows = self.reduce_follows(login)
+        follows.sort()
+        for f in follows:
+            path = f"./output/{f}.ps1"
+            if file_exists(path) is True:
+                continue
+            with open(path, "x") as file:
+                file.write(TEMPLATE)
+                file.close()
+        return follows
