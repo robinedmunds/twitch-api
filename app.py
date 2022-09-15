@@ -34,11 +34,11 @@ def user():
     return "no auth token in memory"
 
 
-@app.route("/followed", methods=["GET"])
-def followed():
+@app.route("/follows", methods=["GET"])
+def follows():
     login = "anarchicuk"
     if twitch.token:
-        res = twitch.fetch_followed(login)
+        res = twitch.fetch_follows(login)
         if res:
             return res
         return "error contacting api, login: {}".format(login)

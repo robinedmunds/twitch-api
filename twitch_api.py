@@ -92,7 +92,7 @@ class TwitchApi:
         except Exception as exc:
             raise Exception("Failed to obtain user(s)") from exc
 
-    def fetch_followed(self, login, limit=100):
+    def fetch_follows(self, login, limit=100):
         user_id = self.fetch_user(login)["data"][0]["id"]
         payload = {
             "from_id": f"{user_id}",
