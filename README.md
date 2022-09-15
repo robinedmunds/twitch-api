@@ -14,7 +14,10 @@ Fetches list of followed twitch streamers from [Twitch API](https://dev.twitch.t
 
 Run in PowerShell.
 
-1. Windows: `./venv/Scripts/Activate.ps1`
-2. `python -m pip install -r requirements.txt`
-3. `python -m flask --app app run --port=80`
-4. http://localhost
+1. copy file **.env_template** to **.env**
+2. populate **.env** with your [twitch api app credentials](https://dev.twitch.tv/console)
+3. `python -m venv venv`
+4. `./venv/Scripts/Activate.ps1`
+5. `python -m pip install -r requirements.txt`
+6. `python -m flask --app app run --port=80`
+7. http://localhost
