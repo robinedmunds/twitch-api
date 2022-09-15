@@ -77,8 +77,16 @@ class TwitchApi:
         except Exception as exc:
             raise Exception("Failed to obtain token") from exc
 
+    def token_is_valid(self):
+        if self.token is None:
+            return False
+        if "access_token" in self.token.keys():
+            return True
+
     def fetch_user(self, login):
-        data = {
+        if self.token_is_valid() is False:
+            raise Exception("Must first obtain auth token")
+        payload = {
             "login": login
         }
         headers = {
@@ -87,13 +95,17 @@ class TwitchApi:
         }
         try:
             user_response = requests.get(
-                self.endpoints["users"]["url"], data=data, headers=headers)
+                self.endpoints["users"]["url"], params=payload,
+                headers=headers
+            )
             if user_response.status_code == HTTPStatus.OK:
                 return user_response.json()
         except Exception as exc:
             raise Exception("Failed to obtain user(s)") from exc
 
     def fetch_follows(self, login, limit=100):
+        if self.token_is_valid() is False:
+            raise Exception("Must first obtain auth token")
         user_id = self.fetch_user(login)["data"][0]["id"]
         payload = {
             "from_id": f"{user_id}",
