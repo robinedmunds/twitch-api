@@ -45,7 +45,7 @@ class TwitchApi:
 
     def generate_state_string(self):
         chars = ascii_letters + digits
-        return "".join([choice(chars) for i in range(32)])
+        return "".join([choice(chars) for i in range(24)])
 
     def build_auth_link(self):
         kwargs = {
@@ -59,7 +59,8 @@ class TwitchApi:
     def twitchAuthResponseIsValid(self, query):
         if "code" in query.keys() and "scope" in query.keys() \
                 and "state" in query.keys():
-            return True
+            if query["state"] == self.state_string:
+                return True
         return False
 
     def fetch_auth_token(self, code):
