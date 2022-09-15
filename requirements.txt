@@ -1,0 +1,7 @@
+autopep8
+Flask
+oauthlib
+pip
+pycodestyle
+python-dotenv
+requests
