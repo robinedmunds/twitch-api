@@ -84,6 +84,7 @@ class TwitchApi:
             return False
         if "access_token" in self.token.keys():
             return True
+        return False
 
     def fetch_user(self, login):
         if self.token_is_valid() is False:
@@ -138,9 +139,10 @@ class TwitchApi:
         return follows
 
     def write_ps1_files(self, login):
-        TEMPLATE = open("./_twitch.ps1").read()
+        self.fetch_follows(login)
         follows = self.reduce_follows(login)
         follows.sort()
+        TEMPLATE = open("./_twitch.ps1").read()
         for f in follows:
             path = f"./output/{f}.ps1"
             if file_exists(path) is True:
