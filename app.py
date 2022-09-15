@@ -1,10 +1,10 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, render_template
 from dotenv import load_dotenv
 from twitch_api import TwitchApi
 
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 twitch = TwitchApi(**{
     "client_id": os.environ["CLIENT_ID"],
@@ -17,13 +17,18 @@ twitch = TwitchApi(**{
 
 @app.route("/", methods=["GET"])
 def index():
+    auth_url = twitch.auth_link
+    return render_template("index.jinja2", auth_url=auth_url)
+
+
+@app.route("/auth", methods=["GET"])
+def auth():
     if twitch.token_is_valid() is True:
         return twitch.token
     if twitch.twitchAuthResponseIsValid(request.args):
         twitch.fetch_auth_token(request.args["code"])
         return twitch.token
-    auth_url = twitch.auth_link
-    return f"<a href={auth_url}>twitch auth link</a>"
+    return "Error: Twitch oauth2 response invalid"
 
 
 @app.route("/user", methods=["GET"])
@@ -48,4 +53,6 @@ def follows():
 @app.route("/write", methods=["GET"])
 def write():
     login = "anarchicuk"
-    return twitch.write_ps1_files(login)
+    if twitch.token_is_valid() is True:
+        return twitch.write_ps1_files(login)
+    return "no auth token in memory"
