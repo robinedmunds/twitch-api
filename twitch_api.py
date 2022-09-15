@@ -12,7 +12,8 @@ from oauthlib.oauth2 import WebApplicationClient
 
 
 class TwitchApi:
-    def __init__(self, client_id, client_secret, redirect_uri, scope, grant_type):
+    def __init__(self, client_id, client_secret, redirect_uri, scope,
+                 grant_type):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
@@ -104,7 +105,9 @@ class TwitchApi:
         }
         try:
             res = requests.get(
-                self.endpoints["follows"]["url"], params=payload, headers=headers)
+                self.endpoints["follows"]["url"], params=payload,
+                headers=headers
+            )
             if res.status_code == HTTPStatus.OK:
                 return res.json()
         except Exception as exc:
