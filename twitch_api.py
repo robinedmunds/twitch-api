@@ -2,6 +2,7 @@ from random import choice
 from string import ascii_letters, digits
 from http import HTTPStatus
 from os.path import exists as file_exists
+from os import makedirs
 import requests
 from oauthlib.oauth2 import WebApplicationClient
 
@@ -143,6 +144,7 @@ class TwitchApi:
         follows = self.reduce_follows(login)
         follows.sort()
         TEMPLATE = open("./_twitch.ps1").read()
+        makedirs("./output/", exist_ok=True)
         for f in follows:
             path = f"./output/{f}.ps1"
             if file_exists(path) is True:
